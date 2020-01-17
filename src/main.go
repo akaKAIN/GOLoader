@@ -33,7 +33,7 @@ func main() {
 	urls, err := GetUrls(fileName)
 	fmt.Printf("Получено ссылок из файла: %d\n", len(urls))
 	if err != nil {
-		log.Fatalf("Ошибка чтения файла: %s\n", err)
+		log.Fatalf("Ошибка чтения файла. Файл %q не найден.\n", fileName)
 	}
 	for _, url := range urls {
 		if url != ""{
@@ -48,7 +48,7 @@ func main() {
 }
 
 func GetUrls(fileName string) ([]string, error) {
-	var urls = make([]string, 8)
+	var urls []string
 
 	fileBody, err := os.Open(fileName)
 	if err != nil {
@@ -76,7 +76,7 @@ func LoadAndSaveFile(url string, index int, format string, wg *sync.WaitGroup) {
 	strIndex = strconv.Itoa(index)
 	fileName = "video_" + strIndex + "." + format
 	if url == ""{
-		err := fmt.Errorf("Получен пустой адресс ссылки.")
+		err := fmt.Errorf("Получен пустой адресс ссылки.\n")
 		log.Println(err)
 	}
 	resp, err := http.Get(url)
@@ -85,7 +85,7 @@ func LoadAndSaveFile(url string, index int, format string, wg *sync.WaitGroup) {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
-	log.Printf("Скачивание по ссылке: %s\n", url)
+	log.Printf("Скачивание файла %q по ссылке: %s\n", fileName, url)
 
 	newFile, err := os.Create(fileName)
 	if err != nil {
@@ -94,5 +94,5 @@ func LoadAndSaveFile(url string, index int, format string, wg *sync.WaitGroup) {
 	defer newFile.Close()
 
 	_, err = io.Copy(newFile, resp.Body)
-	log.Println("Файл успешно сохранен.")
+	log.Printf("Файл %q успешно сохранен.\n", fileName)
 }
